@@ -1,0 +1,18 @@
+{
+    "name": "MyBot",
+    "description": "",
+    "services": [
+        {
+            "type": "endpoint",
+            "appId": "",
+            "appPassword": "",
+            "endpoint": "http://localhost:5000/api/messages",
+            "id": "c6a0db10-8a78-11e9-8c66-75ba43e27dac",
+            "name": "http://localhost:5000/api/messages"
+        }
+    ],
+    "padlock": "",
+    "version": "2.0",
+    "overrides": null,
+    "path": "D:\\src\\yuta\\netcore\\mybot-v4\\MyBot.bot"
+}
