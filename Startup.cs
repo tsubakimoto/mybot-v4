@@ -30,7 +30,9 @@ namespace mybot_v4
                 options.Middleware.Add(new MyMiddleware());
 
                 IStorage dataStore = new MemoryStorage();
+                var userState = new UserState(dataStore);
                 var conversationState = new ConversationState(dataStore);
+                options.State.Add(userState);
                 options.State.Add(conversationState);
             });
 
@@ -41,15 +43,21 @@ namespace mybot_v4
                 {
                     throw new InvalidOperationException("BotFrameworkOptions を事前に構成してください。");
                 }
+                var userState = options.State.OfType<UserState>().FirstOrDefault();
+                if (userState == null)
+                {
+                    throw new InvalidOperationException("UserState を事前に定義してください。");
+                }
                 var conversationState = options.State.OfType<ConversationState>().FirstOrDefault();
                 if (conversationState == null)
                 {
                     throw new InvalidOperationException("ConversationState を事前に定義してください。");
                 }
 
-                var accessors = new MyStateAccessors(conversationState)
+                var accessors = new MyStateAccessors(userState, conversationState)
                 {
                     ConversationDialogState = conversationState.CreateProperty<DialogState>("DialogState"),
+                    UserProfile = userState.CreateProperty<UserProfile>("UserProfile"),
                 };
 
                 return accessors;

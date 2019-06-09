@@ -13,7 +13,7 @@ public class MyBot : IBot
     {
         this.accessors = accessors;
         this.dialogs = new DialogSet(accessors.ConversationDialogState);
-        this.dialogs.Add(new TextPrompt("name"));
+        dialogs.Add(new ProfileDialog(accessors));
     }
 
     public async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
@@ -25,20 +25,15 @@ public class MyBot : IBot
 
             if (results.Status == DialogTurnStatus.Empty)
             {
-                await dialogContext.PromptAsync(
-                    "name",
-                    new PromptOptions { Prompt = MessageFactory.Text("名前を入力してください") },
-                    cancellationToken
-                );
+                await dialogContext.BeginDialogAsync(nameof(ProfileDialog), null, cancellationToken);
             }
             else if (results.Status == DialogTurnStatus.Complete)
             {
-                if (results.Result != null)
-                {
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"ようこそ '{results.Result}' さん！"));
-                }
+                var userProfile = await accessors.UserProfile.GetAsync(turnContext);
+                await turnContext.SendActivityAsync(MessageFactory.Text($"ようこそ '{userProfile.Name}' さん！"));
             }
 
+            await accessors.UserState.SaveChangesAsync(turnContext, false, cancellationToken);
             await accessors.ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
     }
